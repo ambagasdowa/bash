@@ -6,7 +6,6 @@
 ### battery_osd_monitor
 
 Just a simple battery monitor using **osd** and / or *notify-send*
-[link to Google!](http://google.com)
 
 #### Dependencies on debian:
 
