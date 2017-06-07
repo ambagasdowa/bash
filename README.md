@@ -20,6 +20,10 @@ then just run :
 $ sh battery_osd_monitor.sh &
 ```
 
+### Site
+
+[link to Page!](https://ambagasdowa.github.io/bash/)
+
 ### Version updates
 0.0.1
 >Adding colors for bat lower than 15 , 10 and 5 percents
