@@ -14,10 +14,10 @@ elif [ $battery_level -le 15 ];then
       if [ $battery_level -le 15 -a  $battery_level -ge 10 ] ; then
         # notify-send "Battery is lower 15%. Need to charging! Please plug your AC adapter." "Uncharging: ${battery_level}%"
         echo "Battery is lower 15%. Need to charging! Please plug your AC adapter." "Uncharging: ${battery_level}%" | osd_cat -A right -p top -f -adobe-helvetica-*-*-*-*-16-*-*-*-*-*-*-* -c orange -s 7
-      elif [ $battery_level -le 9 ]; then
+      elif [ $battery_level -le 9  -a  $battery_level -ge 6  ]; then
         #statements
         echo "Battery is lower than 10%. Need to charging! Please plug your AC adapter." "Uncharging: ${battery_level}%" | osd_cat -A right -p top -f -adobe-helvetica-*-*-*-*-16-*-*-*-*-*-*-* -c yellow -s 7
-      elif [ $battery_level -le 5 ]; then
+      elif [ $battery_level -lt 5 ]; then
         #statements
         echo "Battery is lower than 5%. Need to charging! Please plug your AC adapter." "Uncharging: ${battery_level}%" | osd_cat -A right -p top -f -adobe-helvetica-*-*-*-*-16-*-*-*-*-*-*-* -c red -s 7
       fi
