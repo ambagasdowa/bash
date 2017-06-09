@@ -12,33 +12,33 @@ status_file=""
 	declare -a files=$(find . -iname "*.$i" -type f -exec basename {} \;)
 	echo "${files[@]}"
 
-	      	for pass in $PASSWORDS; do
+		for pass in $PASSWORDS; do
 
-								for infile in ${files[@]} ; do
-									echo
-									echo "Testing file ${infile} with password ${pass}"
-									7z -p"$pass" t "${infile}"
-									status_file=$?
-									if [ "${status_file}" -eq 0 ]; then
-										if [[  ${#files[@]} > 0 ]]; then
-											echo "Password ${pass} ok then extracting ...."
-											7z -y -aoa -p"$pass" -o"$filepath" e ${infile}
-											echo
-											echo "=====================  Success ====================="
-											echo
-											declare -a patter=( ${files[@]/$infile/} )
-											files=("${patter[@]}")
-										else
-											echo
-										echo "=================  files extracted ==================="
-											echo
-										fi
-							    else
-										echo "$pass is not working with ${infile}"
-							      echo
-							      echo "========================  Fail ======================="
-										echo
-							    fi
-								done
-					done
+			for infile in ${files[@]} ; do
+				echo
+				echo "Testing file ${infile} with password ${pass}"
+				7z -p"$pass" t "${infile}"
+				status_file=$?
+				if [ "${status_file}" -eq 0 ]; then
+					if [[  ${#files[@]} > 0 ]]; then
+						echo "Password ${pass} ok then extracting ...."
+						7z -y -aoa -p"$pass" -o"$filepath" e ${infile}
+						echo
+						echo "=====================  Success ====================="
+						echo
+						declare -a patter=( ${files[@]/$infile/} )
+						files=("${patter[@]}")
+					else
+						echo
+					echo "=================  files extracted ==================="
+						echo
+					fi
+		    else
+					echo "$pass is not working with ${infile}"
+		      echo
+		      echo "========================  Fail ======================="
+					echo
+		    fi
+			done
+		done
 	done;
