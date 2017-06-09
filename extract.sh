@@ -2,7 +2,7 @@
 # TODO read passwords from a database and read a var to set the extraction path
 IFS=$'\n'  # make newlines the only separator
 LIST=$(find . -type f -name '*.*' | sed 's|.*\.||' | sort -u)
-PASSWORDS=$'www.mega-dvdrip.com\nvsacaba\nwww.bajarpelisgratis.com'
+PASSWORDS=$'pass1\npass2\npass3' # whit your passwords
 filepath="/path/to/data/inflating"
 status_file=""
 
