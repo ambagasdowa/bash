@@ -18,6 +18,10 @@ then just run :
 $ sh battery_osd_monitor.sh &
 ```
 
+### Preview
+
+![battery osd monitor](http://baizabal.xyz/img/battery_osd_monitor.png)
+
 ### Site
 
 [link to Page!](https://ambagasdowa.github.io/bash/)
@@ -58,6 +62,6 @@ then you are ready to go
 
 
 TODO
-> set working directory 
+> set working directory
 
 ### more scripts ... soon
