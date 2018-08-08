@@ -20,10 +20,10 @@ if [ $chck != 0 ]; then
           echo "Battery is lower 10%. Need to charging! Please plug your AC adapter." "Uncharging: ${battery_level}% Time: ${remain}" | aosd_cat -p 6 -R orange
         elif [ $battery_level -le 5  -a  $battery_level -ge 3  ]; then
           #statements
-          echo "Battery is lower than 5%. Need to charging! Please plug your AC adapter." "Uncharging: ${battery_level}% Time: ${remain}" | aosd_cat  -p 6 -R yellow
+          echo "Battery is lower than 5%. Need to charging! Please plug your AC adapter." "Uncharging: ${battery_level}% Time: ${remain}" | aosd_cat  -p 6 -c yellow
         elif [ $battery_level -lt 2 ]; then
           #statements
-          echo "Battery is lower than 2%. Need to charging! Please plug your AC adapter." "Uncharging: ${battery_level}% Time: ${remain}" | aosd_cat -p 6 -R red
+          echo "Battery is lower than 2%. Need to charging! Please plug your AC adapter." "Uncharging: ${battery_level}% Time: ${remain}" | aosd_cat -p 6 -c red
         fi
   	fi
   fi
