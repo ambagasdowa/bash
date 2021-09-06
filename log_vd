@@ -1,0 +1,186 @@
+#!/bin/bash
+# NOTE of testing
+# The following calls
+# myscript -vfd ./foo/bar/someFile -o /fizz/someOtherFile
+# myscript -v -f -d -o/fizz/someOtherFile -- ./foo/bar/someFile
+# myscript --verbose --force --debug ./foo/bar/someFile -o/fizz/someOtherFile
+# myscript --output=/fizz/someOtherFile ./foo/bar/someFile -vfd
+# myscript ./foo/bar/someFile -df -v --output /fizz/someOtherFile
+# all return
+#
+# verbose: y, force: y, debug: y, in: ./foo/bar/someFile, out: /fizz/someOtherFile
+#
+# URL_SOURCE https://stackoverflow.com/a/29754866/5090696
+
+getopt --test > /dev/null
+if [[ $? -ne 4 ]]; then
+    echo "I’m sorry, `getopt --test` failed in this environment."
+    exit 1
+fi
+
+OPTIONS=dfo:v
+LONGOPTIONS=debug,force,output:,verbose
+
+# -temporarily store output to be able to check for errors
+# -activate advanced mode getopt quoting e.g. via “--options”
+# -pass arguments only via   -- "$@"   to separate them correctly
+PARSED=$(getopt --options=$OPTIONS --longoptions=$LONGOPTIONS --name "$0" -- "$@")
+if [[ $? -ne 0 ]]; then
+    # e.g. $? == 1
+    #  then getopt has complained about wrong arguments to stdout
+    exit 2
+fi
+# use eval with "$PARSED" to properly handle the quoting
+eval set -- "$PARSED"
+
+# now enjoy the options in order and nicely split until we see --
+while true; do
+    case "$1" in
+        -d|--debug)
+            d=y
+            shift
+            ;;
+        -f|--force)
+            f=y
+            shift
+            ;;
+        -v|--verbose)
+            v=y
+            shift
+            ;;
+        -s|--separator)
+            separator="$3"
+            shift
+            ;;
+        -o|--output)
+            outFile="$2"
+            shift 2
+            ;;
+# NOTE specific options in this 
+        --)
+            shift
+            break
+            ;;
+        *)
+            echo "Programming error"
+            exit 3
+            ;;
+    esac
+done
+
+# handle non-option arguments
+if [[ $# -ne 1 ]]; then
+    echo "$0: Usage: the parameters are the route path to log file created for openvpn "
+    exit 4
+fi
+
+
+if [[ $3 -ne 1 ]]; then
+    separator=","
+fi
+
+# init the program 
+   
+    rm /tmp/fileA.csv && \
+    rm /tmp/fileB.csv && \
+    rm /tmp/fx.a && \
+    rm /tmp/fx.b && \
+    rm /tmp/report.csv
+
+
+
+
+
+#input_file=/var/log/openvpn/status.log
+input_file=$1
+
+echo "Vertical Client List"
+echo "Reading $input_file"
+echo ""
+while read line; do
+    if [[ "$line" = *,* ]]; then
+        IFS=',' read -ra fields <<< "$line"    #Convert string to array
+        if [[ "${fields[1]}" =~ \.[0-9]{1,3}:[0-9] ]]; then
+                received=$((fields[2] / 2**20))
+                sent=$((fields[3] / 2**20))
+                echo "User:  ${fields[0]} from ${fields[1]}"
+                echo "Since: ${fields[4]}"
+                echo "Rcvd:  ${received} MB"
+                echo "Sent:  ${sent} MB"
+                echo ""
+        fi
+    fi
+done < $input_file
+echo ""
+echo "Done reading $input_file"
+echo ""
+
+
+##########################################################################
+
+
+echo "Horizontal Client List"
+echo "Reading $input_file"
+echo " ---- , User , Since , Rcvd , Sent "
+while read line; do
+    if [[ "$line" = *,* ]]; then
+        IFS=',' read -ra fields <<< "$line"    #Convert string to array
+        if [[ "${fields[1]}" =~ \.[0-9]{1,3}:[0-9] ]]; then
+                received=$((fields[2] / 2**20))
+                sent=$((fields[3] / 2**20))
+ #               echo "line: ${fields[0]} from ${fields[1]} , ${fields[4]} , ${received} MB , ${sent} MB"
+                echo "${fields[0]},${fields[4]},${received},${sent}" >> /tmp/fileA.csv
+ #               client=$("${fields[0]},${fields[4]},${received},${sent}\n")
+                #echo ""
+        fi
+    fi
+done < $input_file
+echo ""
+echo "Done reading $input_file"
+echo ""
+
+
+##########################################################################
+
+echo "Table Routing"
+echo "Reading $input_file"
+echo "User , VirtualAddress , RealAddress , LastRef"
+while read line; do
+    if [[ "$line" = *,* ]]; then
+        IFS=',' read -ra fields <<< "$line"    #Convert string to array
+        if [[ "${fields[2]}" =~ \.[0-9]{1,3}:[0-9] ]]; then
+                #received=$((fields[2] / 2**20))
+                #sent=$((fields[3] / 2**20))
+#                echo "line: ${fields[1]} , ${fields[0]} , ${fields[2]} , ${fields[3]} "
+                echo "${fields[1]},${fields[0]},${fields[2]},${fields[3]}" >> /tmp/fileB.csv
+#                routing=$(echo "${fields[1]},${fields[0]},${fields[2]},${fields[3]}")
+                #echo ""
+        fi
+    fi
+done < $input_file
+echo ""
+echo "Done reading $input_file"
+echo ""
+
+# NOTE show the results 
+echo "---------------------------------------------------------------------------------------"
+#echo $routing
+echo "---------------------------------------------------------------------------------------"
+
+#exit 0
+
+ cat /tmp/fileA.csv | sort | uniq >> /tmp/fx.a && cat /tmp/fileB.csv | sort | uniq >> /tmp/fx.b && \
+ join -t, /tmp/fx.a /tmp/fx.b >> /tmp/report.csv 
+    # Launch vd 
+ sed -i.bak 1i"User,Since,Rcvd[MB],Sent[MB],VirtualAddress,RealAddress,LastRef " /tmp/report.csv
+ 
+ # NOTE this can be a parameter in the program 
+  vd /tmp/report.csv
+
+#join -1 2 -2 1 -t, prueba3 prueba2
+
+
+
+
+
+echo "verbose: $v, force: $f, debug: $d, in: $1, out: $outFile"
