@@ -1,0 +1,80 @@
+#!/bin/bash
+# NOTE of testing
+# The following calls
+# myscript -vfd ./foo/bar/someFile -o /fizz/someOtherFile
+# myscript -v -f -d -o/fizz/someOtherFile -- ./foo/bar/someFile
+# myscript --verbose --force --debug ./foo/bar/someFile -o/fizz/someOtherFile
+# myscript --output=/fizz/someOtherFile ./foo/bar/someFile -vfd
+# myscript ./foo/bar/someFile -df -v --output /fizz/someOtherFile
+# all return
+#
+# verbose: y, force: y, debug: y, in: ./foo/bar/someFile, out: /fizz/someOtherFile
+#
+# URL_SOURCE https://stackoverflow.com/a/29754866/5090696
+
+getopt --test > /dev/null
+if [[ $? -ne 4 ]]; then
+    echo "I’m sorry, `getopt --test` failed in this environment."
+    exit 1
+fi
+
+OPTIONS=dfo:v
+LONGOPTIONS=debug,force,output:,verbose
+
+# -temporarily store output to be able to check for errors
+# -activate advanced mode getopt quoting e.g. via “--options”
+# -pass arguments only via   -- "$@"   to separate them correctly
+PARSED=$(getopt --options=$OPTIONS --longoptions=$LONGOPTIONS --name "$0" -- "$@")
+if [[ $? -ne 0 ]]; then
+    # e.g. $? == 1
+    #  then getopt has complained about wrong arguments to stdout
+    exit 2
+fi
+# use eval with "$PARSED" to properly handle the quoting
+eval set -- "$PARSED"
+
+# now enjoy the options in order and nicely split until we see --
+while true; do
+    case "$1" in
+        -d|--debug)
+            d=y
+            shift
+            ;;
+        -f|--force)
+            f=y
+            shift
+            ;;
+        -v|--verbose)
+            v=y
+            shift
+            ;;
+        -s|--separator)
+            separator="$3"
+            shift
+            ;;
+        -o|--output)
+            outFile="$2"
+            shift 2
+            ;;
+# NOTE specific options in this 
+        --)
+            shift
+            break
+            ;;
+        *)
+            echo "Programming error"
+            exit 3
+            ;;
+    esac
+done
+
+# handle non-option arguments
+if [[ $# -ne 1 ]]; then
+    echo "$0: Usage: the parameters are the route path to log file created for openvpn "
+    exit 4
+fi
+
+
+
+
+echo "verbose: $v, force: $f, debug: $d, in: $1, out: $outFile"
